@@ -1,29 +1,64 @@
-# Create T3 App
+# Personal Apps
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+An assortment of personal apps built to track my daily life and to experiment with hosting my own stuff on a home server
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+### Auth
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Basic auth, single account, my account, using better-auth.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+### Fitness Tracker
 
-## Learn More
+Personal workout tracking, inspired by Hevy
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- Should be able to add routines that correspond to a specific day of the week
+- Active routine for that day should be highlighted, and have a calendar for all the routines
+- Each routine should be able to be edited or updated, and each routine is a set of exercises, with each exercise having a target rep
+- I can start a routine that would track how many reps ive gone in the workout
+- Routines can also be sports, so if a routine is "bouldering", there shouldn't be any reps inside the routine.
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### Finance Tracker
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+Personal finance tracking, customized and simplified cuz I was sick of notion
 
-## How do I deploy this?
+- Default view should aggregate over current month, have a time picker to pick all time, per-month, etc.
+- Should be simple, have a pie chart for expenses and income
+- Have a button that opens a dialog that i could input an expense or income, each cashflow item should be taggable with a tag like "grocery" or "gym".
+- Have a table for expenses and income based on date added, descending
+- Be able to edit and delete cashflow items
+- Aggregate view should update upon any changes
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### Chatbot
+
+Powered by local llm hosted on LM Studio
+
+- should have a history of previous chat i've made and i could make a new chat
+- should be able to handle markdown, latex, or code blocks
+- if i dont like the answer, should be able to easily resend the same prompt and get a different result
+- thumbs-up and thumbs-down on chat response
+- have a pop-up in the chat area to load, eject, and switch models
+
+### Media Server
+
+Custom Front-end UI to host jellyfin media server
+
+- Should be able to connect to jellyfin
+- Should be able to upload file/folder like cloud drive
+- should be able to categorize into folders files like cloud drive
+- right click, should open custom context menu depending on the item it is right clicked on
+- should have 2 different views i can switch from, a list, or tiles with thumbnails.
+
+## Infra
+
+### Front-end
+
+My typical front-end webslop stack
+
+### Back-end
+
+My typical back-end webslop stack with some tweaks
+
+### CI/CD
+
+Hosted on my homeserver via docker and exposed via TailScale to the internet.
