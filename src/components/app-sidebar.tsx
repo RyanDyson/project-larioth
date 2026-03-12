@@ -1,10 +1,11 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 
-import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavDocuments } from "@/components/nav-documents"
+import { NavMain } from "@/components/nav-main"
+import { NavSecondary } from "@/components/nav-secondary"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -13,65 +14,167 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import {
-  BarbellIcon,
-  CurrencyDollarIcon,
-  RobotIcon,
-  MonitorPlayIcon,
-  GearIcon,
-  QuestionIcon,
-  MagnifyingGlassIcon,
-  CommandIcon,
-} from "@phosphor-icons/react";
-import Link from "next/link";
+} from "@/components/ui/sidebar"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon } from "lucide-react"
 
 const data = {
   user: {
-    name: "Ryan",
-    email: "ryan@example.com",
+    name: "shadcn",
+    email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
-      title: "Fitness Tracker",
-      url: "/fitness",
-      icon: <BarbellIcon />,
+      title: "Dashboard",
+      url: "#",
+      icon: (
+        <LayoutDashboardIcon
+        />
+      ),
     },
     {
-      title: "Finance Tracker",
-      url: "/finance",
-      icon: <CurrencyDollarIcon />,
+      title: "Lifecycle",
+      url: "#",
+      icon: (
+        <ListIcon
+        />
+      ),
     },
     {
-      title: "Chatbot",
-      url: "/chat",
-      icon: <RobotIcon />,
+      title: "Analytics",
+      url: "#",
+      icon: (
+        <ChartBarIcon
+        />
+      ),
     },
     {
-      title: "Media Server",
-      url: "/media",
-      icon: <MonitorPlayIcon />,
+      title: "Projects",
+      url: "#",
+      icon: (
+        <FolderIcon
+        />
+      ),
+    },
+    {
+      title: "Team",
+      url: "#",
+      icon: (
+        <UsersIcon
+        />
+      ),
+    },
+  ],
+  navClouds: [
+    {
+      title: "Capture",
+      icon: (
+        <CameraIcon
+        />
+      ),
+      isActive: true,
+      url: "#",
+      items: [
+        {
+          title: "Active Proposals",
+          url: "#",
+        },
+        {
+          title: "Archived",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Proposal",
+      icon: (
+        <FileTextIcon
+        />
+      ),
+      url: "#",
+      items: [
+        {
+          title: "Active Proposals",
+          url: "#",
+        },
+        {
+          title: "Archived",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Prompts",
+      icon: (
+        <FileTextIcon
+        />
+      ),
+      url: "#",
+      items: [
+        {
+          title: "Active Proposals",
+          url: "#",
+        },
+        {
+          title: "Archived",
+          url: "#",
+        },
+      ],
     },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "#",
-      icon: <GearIcon />,
+      icon: (
+        <Settings2Icon
+        />
+      ),
     },
     {
       title: "Get Help",
       url: "#",
-      icon: <QuestionIcon />,
+      icon: (
+        <CircleHelpIcon
+        />
+      ),
     },
     {
       title: "Search",
       url: "#",
-      icon: <MagnifyingGlassIcon />,
+      icon: (
+        <SearchIcon
+        />
+      ),
     },
   ],
-};
+  documents: [
+    {
+      name: "Data Library",
+      url: "#",
+      icon: (
+        <DatabaseIcon
+        />
+      ),
+    },
+    {
+      name: "Reports",
+      url: "#",
+      icon: (
+        <FileChartColumnIcon
+        />
+      ),
+    },
+    {
+      name: "Word Assistant",
+      url: "#",
+      icon: (
+        <FileIcon
+        />
+      ),
+    },
+  ],
+}
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -80,21 +183,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<Link href="/" />}
+              render={<a href="#" />}
             >
               <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">Personal Apps</span>
+              <span className="text-base font-semibold">Acme Inc.</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

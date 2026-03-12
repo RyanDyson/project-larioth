@@ -1,0 +1,1 @@
+tailscale funnel http://localhost:3001

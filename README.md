@@ -49,16 +49,76 @@ Custom Front-end UI to host jellyfin media server
 - right click, should open custom context menu depending on the item it is right clicked on
 - should have 2 different views i can switch from, a list, or tiles with thumbnails.
 
+### Excalidraw
+
+I-frame/canvas to access locally hosted excalidraw
+https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation
+
+### Penpot
+
+Probably just link, self-hosted Figma alternative
+
 ## Infra
 
 ### Front-end
 
-My typical front-end webslop stack
+- **Next.js 15** (App Router, Turbopack)
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS v4**
+- **shadcn/ui** — component library
+- **tRPC v11** — end-to-end type-safe API layer
+- **TanStack Query v5** — server state management
+- **Zod v4** — schema validation
+- **Recharts** — charting
+- **Better Auth** — authentication (client-side)
+- **@dnd-kit** — drag and drop
+- **Phosphor Icons** + **Lucide React** — icons
 
 ### Back-end
 
-My typical back-end webslop stack with some tweaks
+- **Next.js API Routes** — HTTP layer
+- **tRPC v11** — typed RPC routers
+- **Drizzle ORM** — type-safe SQL query builder
+- **PostgreSQL** — primary database
+- **Better Auth** — session-based auth with Drizzle adapter
 
 ### CI/CD
 
-Hosted on my homeserver via docker and exposed via TailScale to the internet.
+Hosted on a homeserver via Docker Compose, exposed to the internet via Tailscale Funnel.
+Deployments are automated via a **GitHub Actions self-hosted runner** — no inbound ports or webhooks needed. The runner connects outbound to GitHub and triggers on every push to `main`.
+
+**Stack:**
+
+- **Docker Compose** — orchestrates app, PostgreSQL, and `tailscaled`
+- **Tailscale Funnel** — punches through NAT, no open ports, no payment method required, serves a public HTTPS URL at `https://<hostname>.ts.net`
+- **GitHub Actions (self-hosted runner)** — CI/CD triggered on push to `main`
+
+**First-time setup:**
+
+1. Enable Funnel for your tailnet at [Tailscale ACLs](https://login.tailscale.com/admin/acls) — add `"funnel": ["tag:container"]` or your device's tag
+2. Generate a reusable auth key at [Tailscale Keys](https://login.tailscale.com/admin/settings/keys)
+3. Copy `.env.example` to `.env` and fill in all values, then store it at `~/secrets/personal-apps/.env` on the homeserver
+4. Register a self-hosted runner on the homeserver:
+   - GitHub repo → Settings → Actions → Runners → New self-hosted runner
+   - Follow the setup instructions to install and start the runner as a service
+5. `docker compose up -d`
+
+**Deploy flow (automatic):**
+
+```
+git push origin main
+  → GitHub notifies the self-hosted runner
+  → runner: docker compose up --build -d
+  → runner: bun run db:migrate
+```
+
+You can also deploy manually from the homeserver with `./deploy.sh`.
+
+## Set up home server on new device
+
+### clone repository
+
+```
+git clone
+```

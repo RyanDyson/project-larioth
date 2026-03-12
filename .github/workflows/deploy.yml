@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: self-hosted
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore .env
+        # .env is stored securely on the homeserver, not in the repo
+        run: cp $HOME/secrets/personal-apps/.env .env
+
+      - name: Build & restart containers
+        run: docker compose up --build -d
+
+      - name: Run database migrations
+        run: docker compose exec -T app bun run db:migrate
+
+      - name: Clean up old images
+        run: docker image prune -f

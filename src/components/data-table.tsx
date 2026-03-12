@@ -92,7 +92,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { DotsSixVerticalIcon, CheckCircleIcon, SpinnerIcon, DotsThreeVerticalIcon, ColumnsIcon, CaretDownIcon, PlusIcon, CaretDoubleLeftIcon, CaretLeftIcon, CaretRightIcon, CaretDoubleRightIcon, TrendUpIcon } from "@phosphor-icons/react"
+import { GripVerticalIcon, CircleCheckIcon, LoaderIcon, EllipsisVerticalIcon, Columns3Icon, ChevronDownIcon, PlusIcon, ChevronsLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsRightIcon, TrendingUpIcon } from "lucide-react"
 
 export const schema = z.object({
   id: z.number(),
@@ -117,7 +117,7 @@ function DragHandle({ id }: { id: number }) {
       size="icon"
       className="size-7 text-muted-foreground hover:bg-transparent"
     >
-      <DotsSixVerticalIcon className="size-3 text-muted-foreground" />
+      <GripVerticalIcon className="size-3 text-muted-foreground" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
   )
@@ -180,9 +180,9 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     cell: ({ row }) => (
       <Badge variant="outline" className="px-1.5 text-muted-foreground">
         {row.original.status === "Done" ? (
-          <CheckCircleIcon className="fill-green-500 dark:fill-green-400" />
+          <CircleCheckIcon className="fill-green-500 dark:fill-green-400" />
         ) : (
-          <SpinnerIcon
+          <LoaderIcon
           />
         )}
         {row.original.status}
@@ -291,7 +291,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
             />
           }
         >
-          <DotsThreeVerticalIcon
+          <EllipsisVerticalIcon
           />
           <span className="sr-only">Open menu</span>
         </DropdownMenuTrigger>
@@ -439,9 +439,9 @@ export function DataTable({
             <DropdownMenuTrigger
               render={<Button variant="outline" size="sm" />}
             >
-              <ColumnsIcon data-icon="inline-start" />
+              <Columns3Icon data-icon="inline-start" />
               Columns
-              <CaretDownIcon data-icon="inline-end" />
+              <ChevronDownIcon data-icon="inline-end" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
               {table
@@ -577,7 +577,7 @@ export function DataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to first page</span>
-                <CaretDoubleLeftIcon
+                <ChevronsLeftIcon
                 />
               </Button>
               <Button
@@ -588,7 +588,7 @@ export function DataTable({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to previous page</span>
-                <CaretLeftIcon
+                <ChevronLeftIcon
                 />
               </Button>
               <Button
@@ -599,7 +599,7 @@ export function DataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to next page</span>
-                <CaretRightIcon
+                <ChevronRightIcon
                 />
               </Button>
               <Button
@@ -610,7 +610,7 @@ export function DataTable({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <CaretDoubleRightIcon
+                <ChevronsRightIcon
                 />
               </Button>
             </div>
@@ -736,7 +736,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <div className="grid gap-2">
                 <div className="flex gap-2 leading-none font-medium">
                   Trending up by 5.2% this month{" "}
-                  <TrendUpIcon className="size-4" />
+                  <TrendingUpIcon className="size-4" />
                 </div>
                 <div className="text-muted-foreground">
                   Showing total visitors for the last 6 months. This is just

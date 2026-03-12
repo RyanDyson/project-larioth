@@ -6,9 +6,12 @@ import { Geist, JetBrains_Mono, DM_Sans } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 import { cn } from "@/lib/utils";
 
-const dmSans = DM_Sans({subsets:['latin'],variable:'--font-sans'});
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
-const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -25,7 +28,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(geist.variable, jetbrainsMono.variable, "font-sans", dmSans.variable)}>
+    <html
+      lang="en"
+      className={cn(
+        geist.variable,
+        jetbrainsMono.variable,
+        "dark font-sans",
+        dmSans.variable,
+      )}
+    >
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>

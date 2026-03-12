@@ -1,0 +1,7 @@
+# Replace with your actual domain (e.g. apps.yourdomain.com)
+# Caddy listens on the internal Docker network; Cloudflare Tunnel
+# terminates TLS externally, so we only need plain HTTP here.
+
+:80 {
+    reverse_proxy app:3000
+}
