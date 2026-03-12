@@ -2,7 +2,6 @@
 
 import * as React from "react";
 
-import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -25,6 +24,7 @@ import {
   MagnifyingGlassIcon,
   CommandIcon,
 } from "@phosphor-icons/react";
+import Link from "next/link";
 
 const data = {
   user: {
@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="/" />}
+              render={<Link href="/" />}
             >
               <CommandIcon className="size-5!" />
               <span className="text-base font-semibold">Personal Apps</span>

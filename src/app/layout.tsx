@@ -1,10 +1,12 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist, JetBrains_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono, DM_Sans } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { cn } from "@/lib/utils";
+
+const dmSans = DM_Sans({subsets:['latin'],variable:'--font-sans'});
 
 const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
 
@@ -23,7 +25,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(geist.variable, "font-mono", jetbrainsMono.variable)}>
+    <html lang="en" className={cn(geist.variable, jetbrainsMono.variable, "font-sans", dmSans.variable)}>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
