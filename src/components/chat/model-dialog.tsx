@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
+import { DataTable } from "../global/data-table";
 
 type Model = {
   id: string;
@@ -40,49 +42,6 @@ type ModelDialogProps = {
   onSelectAction?: (model: Model) => void;
 };
 
-const MOCK_MODELS: Model[] = [
-  {
-    id: "qwen3.5-9b",
-    name: "Qwen3.5 9B",
-    quantization: "Q4_K_M",
-    publisher: "qwen",
-    params: "9B",
-    tag: "qwen35",
-    format: "GGUF",
-    size: "6.10 GB",
-  },
-  {
-    id: "llama3.1-8b",
-    name: "Llama 3.1 8B",
-    quantization: "Q5_K_M",
-    publisher: "meta",
-    params: "8B",
-    tag: "llama3",
-    format: "GGUF",
-    size: "5.73 GB",
-  },
-  {
-    id: "mistral-7b",
-    name: "Mistral 7B",
-    quantization: "Q4_K_S",
-    publisher: "mistral",
-    params: "7B",
-    tag: "mistral",
-    format: "GGUF",
-    size: "4.37 GB",
-  },
-  {
-    id: "phi3-mini-4b",
-    name: "Phi-3 Mini 4B",
-    quantization: "Q8_0",
-    publisher: "microsoft",
-    params: "4B",
-    tag: "phi3",
-    format: "GGUF",
-    size: "4.06 GB",
-  },
-];
-
 export function ModelDialog({
   open,
   onOpenChangeAction,
@@ -92,16 +51,7 @@ export function ModelDialog({
   const [sort, setSort] = useState<SortKey>("recency");
   const [manualLoad, setManualLoad] = useState(false);
 
-  const models = MOCK_MODELS.filter((model) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      model.name.toLowerCase().includes(q) ||
-      model.publisher.toLowerCase().includes(q) ||
-      model.tag.toLowerCase().includes(q)
-    );
-  });
-
+  const { data: models, isPending } = api.model.listDownloadedModels.useQuery();
   return (
     <Dialog open={open} onOpenChange={onOpenChangeAction}>
       <DialogContent
@@ -164,51 +114,6 @@ export function ModelDialog({
         </div>
 
         {/* Model list */}
-        <div className="max-h-105 overflow-y-auto">
-          {models.map((model) => (
-            <button
-              key={model.id}
-              type="button"
-              onClick={() => onSelectAction?.(model)}
-              className="border-border hover:bg-muted/50 grid w-full grid-cols-[minmax(0,1.6fr)_auto_auto_auto_auto_auto_auto_auto] items-center gap-2 border-b px-4 py-3 text-left"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{model.name}</p>
-                <Badge variant="outline" className="mt-1 font-mono text-[10px]">
-                  {model.quantization}
-                </Badge>
-              </div>
-
-              <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                <EyeIcon className="size-3" />
-                <LightningIcon className="size-3" />
-                <TreeStructureIcon className="size-3" />
-              </div>
-
-              <span className="text-muted-foreground text-xs">
-                {model.params}
-              </span>
-
-              <Badge variant="secondary" className="font-mono text-[10px]">
-                {model.tag}
-              </Badge>
-
-              <Badge className="border-yellow-500/30 bg-yellow-500/15 font-mono text-[10px] text-yellow-500">
-                {model.format}
-              </Badge>
-
-              <span className="text-muted-foreground text-right text-xs">
-                {model.size}
-              </span>
-            </button>
-          ))}
-
-          {models.length === 0 && (
-            <div className="text-muted-foreground px-4 py-8 text-center text-xs">
-              No models match your search.
-            </div>
-          )}
-        </div>
 
         {/* Footer */}
         <div className="border-border flex items-center gap-3 border-t px-4 py-3">
