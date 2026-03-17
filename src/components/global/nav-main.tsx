@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { CirclePlusIcon, MailIcon } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { PlusCircle } from "@phosphor-icons/react";
+import { openCommand } from "@/components/global/nav-command";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: React.ReactNode
-  }[]
+    title: string;
+    url: string;
+    icon?: React.ReactNode;
+  }[];
 }) {
   return (
     <SidebarGroup>
@@ -25,22 +25,13 @@ export function NavMain({
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
-              tooltip="Quick Create"
-              className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+              tooltip="Quick Access"
+              onClick={openCommand}
+              className="from-primary/20 to-primary/30 border-primary/30 hover:from-primary/30 text-primary-foreground hover:text-primary-foreground active:text-primary-foreground min-w-8 cursor-pointer border bg-linear-to-b transition-all duration-200 ease-linear hover:bg-transparent"
             >
-              <CirclePlusIcon
-              />
-              <span>Quick Create</span>
+              <PlusCircle />
+              <span>Quick Access</span>
             </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <MailIcon
-              />
-              <span className="sr-only">Inbox</span>
-            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
@@ -55,5 +46,5 @@ export function NavMain({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

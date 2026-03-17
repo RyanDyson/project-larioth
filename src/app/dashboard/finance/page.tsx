@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
+import { AppSidebar } from "@/components/global/app-sidebar";
+import { SiteHeader } from "@/components/global/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -178,6 +179,8 @@ const TAG_COLORS: Record<string, string> = {
 type TimePeriod = "month" | "alltime";
 
 export default function FinancePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [items, setItems] = React.useState<CashflowItem[]>(seedData);
   const [period, setPeriod] = React.useState<TimePeriod>("month");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -214,6 +217,20 @@ export default function FinancePage() {
   const sorted = [...filtered].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
+
+  React.useEffect(() => {
+    const action = searchParams.get("action");
+    if (action === "new-expense") {
+      openNew("expense");
+      router.replace("/dashboard/finance");
+      return;
+    }
+
+    if (action === "new-income") {
+      openNew("income");
+      router.replace("/dashboard/finance");
+    }
+  }, [router, searchParams]);
 
   function openNew(type: CashflowType) {
     setEditingItem({

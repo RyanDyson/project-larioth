@@ -1,35 +1,27 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
-  index,
   pgTable,
   pgTableCreator,
   text,
   timestamp,
+  uuid,
+  pgEnum,
 } from "drizzle-orm/pg-core";
+
+export enum MessageRole {
+  SYSTEM = "system",
+  USER = "user",
+  ASSISTANT = "assistant",
+}
 
 export const createTable = pgTableCreator((name) => `pg-drizzle_${name}`);
 
-export const posts = createTable(
-  "post",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdById: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => user.id),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .$defaultFn(() => new Date())
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-  (t) => [
-    index("created_by_idx").on(t.createdById),
-    index("name_idx").on(t.name),
-  ],
-);
+export const messageRoleEnum = pgEnum("role", [
+  MessageRole.SYSTEM,
+  MessageRole.USER,
+  MessageRole.ASSISTANT,
+]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -89,6 +81,34 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at").$defaultFn(
     () => /* @__PURE__ */ new Date(),
   ),
+});
+
+export const chats = pgTable("chats", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  user_id: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const messages = pgTable("messages", {
+  uuid: uuid("uuid").primaryKey().defaultRandom(),
+  content: text("content").notNull(),
+  role: messageRoleEnum("role").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  model: text("model").notNull(),
+  chat_uuid: uuid("chat_uuid").references(() => chats.uuid, {
+    onDelete: "cascade",
+  }),
 });
 
 export const userRelations = relations(user, ({ many }) => ({

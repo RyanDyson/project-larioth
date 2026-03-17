@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
+import { AppSidebar } from "@/components/global/app-sidebar";
+import { SiteHeader } from "@/components/global/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -112,6 +112,7 @@ export default function FitnessPage() {
   }
 
   function openEdit(routine: Routine) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     setEditingRoutine(JSON.parse(JSON.stringify(routine)));
     setIsEditOpen(true);
   }
@@ -169,6 +170,7 @@ export default function FitnessPage() {
   function toggleDone(name: string) {
     if (!activeSession) return;
     const done = new Set(activeSession.done);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     done.has(name) ? done.delete(name) : done.add(name);
     setActiveSession({ ...activeSession, done });
   }
@@ -176,7 +178,7 @@ export default function FitnessPage() {
   const routinesByDay = React.useMemo(() => {
     const map: Record<number, Routine[]> = {};
     for (const r of routines) {
-      if (!map[r.day]) map[r.day] = [];
+      map[r.day] ??= [];
       map[r.day]!.push(r);
     }
     return map;
