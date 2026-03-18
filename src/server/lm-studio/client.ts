@@ -1,3 +1,4 @@
+import "server-only";
 import { LMStudioClient } from "@lmstudio/sdk";
 import { env } from "@/env";
 

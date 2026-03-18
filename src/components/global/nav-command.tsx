@@ -14,20 +14,13 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import {
-  BankIcon,
-  BarbellIcon,
-  ChatCircleIcon,
   CompassIcon,
-  CurrencyDollarIcon,
-  MusicNotesIcon,
-  RobotIcon,
-  SquaresFourIcon,
-  WalletIcon,
   ArrowDownIcon,
   ArrowUpIcon,
   ArrowElbowDownLeftIcon,
 } from "@phosphor-icons/react";
 import { KeyboardIcon } from "./keyboard-icon";
+import { navItems, actionItems } from "@/lib/nav-items";
 
 export const GLOBAL_COMMAND_OPEN_EVENT = "app:open-command-palette";
 
@@ -45,60 +38,6 @@ export function useCommandPalette() {
     openCommand,
   };
 }
-
-const routes = [
-  {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: SquaresFourIcon,
-    shortcut: "G D",
-  },
-  {
-    label: "Chat",
-    href: "/dashboard/chat",
-    icon: RobotIcon,
-    shortcut: "G C",
-  },
-  {
-    label: "Finance",
-    href: "/dashboard/finance",
-    icon: WalletIcon,
-    shortcut: "G F",
-  },
-  {
-    label: "Fitness",
-    href: "/dashboard/fitness",
-    icon: BarbellIcon,
-    shortcut: "G W",
-  },
-  {
-    label: "Media",
-    href: "/dashboard/media",
-    icon: MusicNotesIcon,
-    shortcut: "G M",
-  },
-];
-
-const actions = [
-  {
-    label: "Create New Chat",
-    shortcut: "N C",
-    href: "/dashboard/chat?action=new-chat",
-    icon: ChatCircleIcon,
-  },
-  {
-    label: "Input New Expense",
-    shortcut: "N E",
-    href: "/dashboard/finance?action=new-expense",
-    icon: CurrencyDollarIcon,
-  },
-  {
-    label: "Input New Income",
-    shortcut: "N I",
-    href: "/dashboard/finance?action=new-income",
-    icon: BankIcon,
-  },
-];
 
 export function NavCommand() {
   const router = useRouter();
@@ -152,7 +91,7 @@ export function NavCommand() {
           </CommandEmpty>
 
           <CommandGroup heading="Apps">
-            {routes.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
 
@@ -191,15 +130,14 @@ export function NavCommand() {
           <CommandSeparator />
 
           <CommandGroup heading="Quick Actions">
-            {actions.map((item) => {
-              const Icon = item.icon;
+            {actionItems.map((item) => {
               return (
                 <CommandItem
                   key={item.label}
                   onSelect={() => navigate(item.href)}
                   className="cursor-pointer py-2 transition-all duration-100"
                 >
-                  <Icon className="size-4" />
+                  <item.icon className="size-4" />
                   <span className="flex-1 text-sm font-medium">
                     {item.label}
                   </span>

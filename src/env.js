@@ -19,7 +19,13 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     TAILSCALE_AUTHKEY: z.string(),
     LM_API_TOKEN: z.string(),
-    LM_BASE_URL: z.string().url(),
+    LM_BASE_URL: z
+      .string()
+      .url()
+      .refine((url) => url.startsWith("ws://") || url.startsWith("wss://"), {
+        message:
+          'LM_BASE_URL must use "ws://" or "wss://" protocol (LM Studio uses WebSockets)',
+      }),
   },
 
   /**
