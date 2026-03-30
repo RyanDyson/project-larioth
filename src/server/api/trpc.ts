@@ -13,8 +13,6 @@ import { ZodError } from "zod";
 
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
-import { lmStudioClient } from "@/server/lm-studio/client";
-
 /**
  * 1. CONTEXT
  *
@@ -34,7 +32,6 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   return {
     db,
     session,
-    lmStudioClient,
     ...opts,
   };
 };

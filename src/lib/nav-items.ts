@@ -10,7 +10,7 @@ import {
   type Icon,
 } from "@phosphor-icons/react";
 
-type NavItem = {
+export type NavItem = {
   label: string;
   href: string;
   icon: Icon;

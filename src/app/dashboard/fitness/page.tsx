@@ -185,207 +185,196 @@ export default function FitnessPage() {
   }, [routines]);
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col gap-6 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Fitness Tracker</h1>
-              <p className="text-muted-foreground text-sm">
-                Your weekly workout schedule
-              </p>
-            </div>
-            <Button size="sm">
-              <PlusIcon className="mr-1 size-4" />
-              Add Routine
-            </Button>
+    <>
+      <div className="flex flex-1 flex-col gap-6 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Fitness Tracker</h1>
+            <p className="text-muted-foreground text-sm">
+              Your weekly workout schedule
+            </p>
           </div>
+          <Button size="sm">
+            <PlusIcon className="mr-1 size-4" />
+            Add Routine
+          </Button>
+        </div>
 
-          <Tabs defaultValue="schedule">
-            <TabsList>
-              <TabsTrigger value="schedule">
-                <BarbellIcon className="mr-1 size-4" />
-                Schedule
-              </TabsTrigger>
-              <TabsTrigger value="calendar">
-                <CalendarIcon className="mr-1 size-4" />
-                Calendar
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="schedule">
+          <TabsList>
+            <TabsTrigger value="schedule">
+              <BarbellIcon className="mr-1 size-4" />
+              Schedule
+            </TabsTrigger>
+            <TabsTrigger value="calendar">
+              <CalendarIcon className="mr-1 size-4" />
+              Calendar
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Schedule Tab */}
-            <TabsContent value="schedule" className="mt-4">
-              <div className="grid grid-cols-7 gap-3">
-                {DAYS.map((day, idx) => {
-                  const isToday = idx === TODAY_INDEX;
-                  const dayRoutines = routinesByDay[idx] ?? [];
-                  return (
-                    <div
-                      key={day}
-                      className={cn(
-                        "flex min-h-50 flex-col gap-2 rounded-xl border p-3",
-                        isToday &&
-                          "border-primary bg-primary/5 ring-primary/30 ring-1",
+          {/* Schedule Tab */}
+          <TabsContent value="schedule" className="mt-4">
+            <div className="grid grid-cols-7 gap-3">
+              {DAYS.map((day, idx) => {
+                const isToday = idx === TODAY_INDEX;
+                const dayRoutines = routinesByDay[idx] ?? [];
+                return (
+                  <div
+                    key={day}
+                    className={cn(
+                      "flex min-h-50 flex-col gap-2 rounded-xl border p-3",
+                      isToday &&
+                        "border-primary bg-primary/5 ring-primary/30 ring-1",
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          isToday ? "text-primary" : "text-muted-foreground",
+                        )}
+                      >
+                        {day}
+                      </span>
+                      {isToday && (
+                        <Badge
+                          variant="outline"
+                          className="text-primary border-primary/40 px-1.5 py-0 text-xs"
+                        >
+                          Today
+                        </Badge>
                       )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
+                    </div>
+                    <div className="flex flex-1 flex-col gap-2">
+                      {dayRoutines.length === 0 && (
+                        <p className="text-muted-foreground mt-2 text-xs">
+                          Rest day
+                        </p>
+                      )}
+                      {dayRoutines.map((routine) => (
+                        <Card
+                          key={routine.id}
                           className={cn(
-                            "text-sm font-semibold",
-                            isToday ? "text-primary" : "text-muted-foreground",
+                            "cursor-pointer transition-shadow hover:shadow-md",
+                            isToday && "border-primary/30",
                           )}
                         >
-                          {day}
-                        </span>
-                        {isToday && (
-                          <Badge
-                            variant="outline"
-                            className="text-primary border-primary/40 px-1.5 py-0 text-xs"
-                          >
-                            Today
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex flex-1 flex-col gap-2">
-                        {dayRoutines.length === 0 && (
-                          <p className="text-muted-foreground mt-2 text-xs">
-                            Rest day
-                          </p>
-                        )}
-                        {dayRoutines.map((routine) => (
-                          <Card
-                            key={routine.id}
-                            className={cn(
-                              "cursor-pointer transition-shadow hover:shadow-md",
-                              isToday && "border-primary/30",
-                            )}
-                          >
-                            <CardHeader className="p-3 pb-1.5">
-                              <div className="flex items-start justify-between gap-1">
-                                <div className="flex items-center gap-1.5">
-                                  {routine.isSport ? (
-                                    <SoccerBallIcon className="text-muted-foreground size-3.5 shrink-0" />
-                                  ) : (
-                                    <BarbellIcon className="text-muted-foreground size-3.5 shrink-0" />
-                                  )}
-                                  <CardTitle className="text-xs leading-tight font-medium">
-                                    {routine.name}
-                                  </CardTitle>
-                                </div>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="p-3 pt-1">
-                              {!routine.isSport && (
-                                <p className="text-muted-foreground text-xs">
-                                  {routine.exercises.length} exercises
-                                </p>
-                              )}
-                              {routine.isSport && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Sport
-                                </Badge>
-                              )}
-                              <div className="mt-2 flex gap-1">
-                                {isToday && (
-                                  <Button
-                                    size="sm"
-                                    variant="default"
-                                    className="h-6 flex-1 px-2 text-xs"
-                                    onClick={() => startRoutine(routine)}
-                                  >
-                                    <PlayIcon className="mr-0.5 size-3" />
-                                    Start
-                                  </Button>
+                          <CardHeader className="p-3 pb-1.5">
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="flex items-center gap-1.5">
+                                {routine.isSport ? (
+                                  <SoccerBallIcon className="text-muted-foreground size-3.5 shrink-0" />
+                                ) : (
+                                  <BarbellIcon className="text-muted-foreground size-3.5 shrink-0" />
                                 )}
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => openEdit(routine)}
-                                >
-                                  <PencilSimpleIcon className="size-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-destructive hover:text-destructive h-6 w-6 p-0"
-                                  onClick={() => deleteRoutine(routine.id)}
-                                >
-                                  <TrashIcon className="size-3" />
-                                </Button>
+                                <CardTitle className="text-xs leading-tight font-medium">
+                                  {routine.name}
+                                </CardTitle>
                               </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="p-3 pt-1">
+                            {!routine.isSport && (
+                              <p className="text-muted-foreground text-xs">
+                                {routine.exercises.length} exercises
+                              </p>
+                            )}
+                            {routine.isSport && (
+                              <Badge variant="secondary" className="text-xs">
+                                Sport
+                              </Badge>
+                            )}
+                            <div className="mt-2 flex gap-1">
+                              {isToday && (
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  className="h-6 flex-1 px-2 text-xs"
+                                  onClick={() => startRoutine(routine)}
+                                >
+                                  <PlayIcon className="mr-0.5 size-3" />
+                                  Start
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0"
+                                onClick={() => openEdit(routine)}
+                              >
+                                <PencilSimpleIcon className="size-3" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive h-6 w-6 p-0"
+                                onClick={() => deleteRoutine(routine.id)}
+                              >
+                                <TrashIcon className="size-3" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-            </TabsContent>
+                  </div>
+                );
+              })}
+            </div>
+          </TabsContent>
 
-            {/* Calendar Tab */}
-            <TabsContent value="calendar" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">March 2026</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-2 grid grid-cols-7 gap-1">
-                    {DAYS.map((d) => (
+          {/* Calendar Tab */}
+          <TabsContent value="calendar" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">March 2026</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-2 grid grid-cols-7 gap-1">
+                  {DAYS.map((d) => (
+                    <div
+                      key={d}
+                      className="text-muted-foreground py-1 text-center text-xs font-medium"
+                    >
+                      {d}
+                    </div>
+                  ))}
+                </div>
+                {/* offset: March 2026 starts on Sunday, which is index 6 in Mon-first grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={`empty-${i}`} />
+                  ))}
+                  {MONTH_DAYS.map((d) => {
+                    const isCompleted = completedDays.has(d);
+                    const isToday = d === 11;
+                    return (
                       <div
                         key={d}
-                        className="text-muted-foreground py-1 text-center text-xs font-medium"
+                        className={cn(
+                          "flex aspect-square flex-col items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                          isCompleted && "bg-primary text-primary-foreground",
+                          isToday &&
+                            !isCompleted &&
+                            "ring-primary text-primary ring-2",
+                          !isCompleted &&
+                            !isToday &&
+                            "text-muted-foreground hover:bg-accent",
+                        )}
                       >
                         {d}
+                        {isCompleted && (
+                          <CheckCircleIcon className="mt-0.5 size-3" />
+                        )}
                       </div>
-                    ))}
-                  </div>
-                  {/* offset: March 2026 starts on Sunday, which is index 6 in Mon-first grid */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={`empty-${i}`} />
-                    ))}
-                    {MONTH_DAYS.map((d) => {
-                      const isCompleted = completedDays.has(d);
-                      const isToday = d === 11;
-                      return (
-                        <div
-                          key={d}
-                          className={cn(
-                            "flex aspect-square flex-col items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                            isCompleted && "bg-primary text-primary-foreground",
-                            isToday &&
-                              !isCompleted &&
-                              "ring-primary text-primary ring-2",
-                            !isCompleted &&
-                              !isToday &&
-                              "text-muted-foreground hover:bg-accent",
-                          )}
-                        >
-                          {d}
-                          {isCompleted && (
-                            <CheckCircleIcon className="mt-0.5 size-3" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </SidebarInset>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Edit Routine Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -592,6 +581,6 @@ export default function FitnessPage() {
           )}
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }

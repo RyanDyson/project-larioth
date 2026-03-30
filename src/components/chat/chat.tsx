@@ -2,13 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  CaretDownIcon,
-  CircleNotchIcon,
-  TrashIcon,
-  WarningCircleIcon,
-  PaperPlaneTiltIcon,
-} from "@phosphor-icons/react";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion } from "motion/react";
@@ -48,7 +42,7 @@ const initialMessages: message[] = [
 export function Chat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [chatHistory, setChatHistory] = useState<message[]>(initialMessages);
@@ -282,84 +276,6 @@ export function Chat() {
             </motion.div>
           )}
         </div>
-
-        <motion.div
-          layout
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="from-background/70 to-background/80 border-border flex h-fit w-full max-w-xl grow items-center justify-center gap-2 rounded-t-xl border bg-linear-to-b p-4 backdrop-blur-xl"
-        >
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button
-                size="icon"
-                variant="ghost"
-                disabled={isSendingChat}
-                className="hover:text-primary text-primary border-primary/30 hover:bg-primary/30 from-primary/10 to-primary/20 size-11 shrink-0 cursor-pointer rounded-full border bg-transparent bg-linear-to-b font-bold backdrop-blur-lg"
-              >
-                <TrashIcon className="size-3.5" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-primary flex items-center gap-2">
-                  <WarningCircleIcon /> Clear conversation?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will remove all messages from the current conversation.
-                  This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="flex w-full flex-row gap-2">
-                <AlertDialogCancel className="grow cursor-pointer shadow-none ring-0">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => setChatHistory(initialMessages)}
-                  className="border-primary from-primary/80 to-primary/90 grow cursor-pointer border bg-transparent bg-linear-to-b shadow-none"
-                >
-                  Clear
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Textarea
-            placeholder="Ask the library assistant anything..."
-            onFocus={(e) => {
-              e.target.placeholder = "Type your message...";
-            }}
-            onBlur={(e) => {
-              e.target.placeholder = "Ask the library assistant anything...";
-            }}
-            value={inputValue}
-            ref={inputRef}
-            rows={1}
-            disabled={isSendingChat}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (
-                e.target === inputRef.current &&
-                e.key === "Enter" &&
-                !e.shiftKey
-              ) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            className="field-sizing-content max-h-64 min-h-8 resize-none overflow-auto overflow-y-auto border-none bg-transparent py-2.5 leading-relaxed shadow-none outline-none focus-visible:border-none focus-visible:ring-0"
-          />
-          <Button
-            size="icon"
-            onClick={handleSend}
-            disabled={isSendingChat || inputValue.trim() === ""}
-            className="border-primary/30 hover:bg-primary/30 from-primary/10 to-primary/20 size-11 h-fit shrink-0 cursor-pointer rounded-full border bg-transparent bg-linear-to-b"
-          >
-            {isSendingChat ? (
-              <CircleNotchIcon className="text-primary size-4 animate-spin" />
-            ) : (
-              <PaperPlaneTiltIcon className="size-4" />
-            )}
-          </Button>
-        </motion.div>
       </div>
     </div>
   );

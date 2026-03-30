@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
+import { api } from "@/trpc/react";
 
 type BreadcrumbSegment = {
   label: string;

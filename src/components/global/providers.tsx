@@ -1,7 +1,6 @@
 import { TRPCReactProvider } from "@/trpc/react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { NavCommand } from "@/components/global/nav-command";
 
 import { Toaster } from "sonner";
 
@@ -18,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }
         >
           <Toaster position="top-center" />
-          <NavCommand />
+
           {children}
         </SidebarProvider>
       </TooltipProvider>

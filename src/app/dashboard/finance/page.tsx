@@ -278,262 +278,245 @@ export default function FinancePage() {
   );
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col gap-6 p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold">Finance Tracker</h1>
-              <p className="text-muted-foreground text-sm">
-                Track your income and expenses
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Tabs
-                value={period}
-                onValueChange={(v) => setPeriod(v as TimePeriod)}
-              >
-                <TabsList>
-                  <TabsTrigger value="month">
-                    <CalendarIcon className="mr-1 size-3.5" />
-                    This Month
-                  </TabsTrigger>
-                  <TabsTrigger value="alltime">All Time</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              <Button size="sm" onClick={() => openNew("expense")}>
-                <PlusIcon className="mr-1 size-4" />
-                Add
-              </Button>
-            </div>
+    <>
+      <div className="flex flex-1 flex-col gap-6 p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">Finance Tracker</h1>
+            <p className="text-muted-foreground text-sm">
+              Track your income and expenses
+            </p>
           </div>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-muted-foreground text-sm font-medium">
-                  Total Income
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <ArrowUpIcon className="size-4 text-green-500" />
-                  <span className="text-2xl font-semibold">
-                    ${totalIncome.toLocaleString()}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-muted-foreground text-sm font-medium">
-                  Total Expenses
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <ArrowDownIcon className="size-4 text-red-500" />
-                  <span className="text-2xl font-semibold">
-                    ${totalExpenses.toLocaleString()}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-muted-foreground text-sm font-medium">
-                  Balance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <span
-                  className={cn(
-                    "text-2xl font-semibold",
-                    balance >= 0 ? "text-green-500" : "text-red-500",
-                  )}
-                >
-                  {balance >= 0 ? "+" : ""}${balance.toLocaleString()}
-                </span>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-3 gap-6">
-            {/* Pie Chart */}
-            <Card className="col-span-1">
-              <CardHeader>
-                <CardTitle className="text-sm">Expenses by Category</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                {expenseByTag.length > 0 ? (
-                  <>
-                    <ChartContainer
-                      config={chartConfig}
-                      className="h-50 w-full"
-                    >
-                      <PieChart>
-                        <Pie
-                          data={expenseByTag}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          dataKey="value"
-                        >
-                          {expenseByTag.map((entry) => (
-                            <Cell
-                              key={entry.name}
-                              fill={TAG_COLORS[entry.name] ?? "var(--chart-1)"}
-                            />
-                          ))}
-                        </Pie>
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                      </PieChart>
-                    </ChartContainer>
-                    <div className="mt-2 flex w-full flex-col gap-1">
-                      {expenseByTag.map(({ name, value }) => (
-                        <div
-                          key={name}
-                          className="flex items-center justify-between text-xs"
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <div
-                              className="size-2.5 rounded-full"
-                              style={{
-                                background:
-                                  TAG_COLORS[name] ?? "var(--chart-1)",
-                              }}
-                            />
-                            <span className="text-muted-foreground">
-                              {name}
-                            </span>
-                          </div>
-                          <span className="font-medium">${value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-muted-foreground py-12 text-sm">
-                    No expenses
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Transactions Table */}
-            <Card className="col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-sm">Transactions</CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => openNew("income")}
-                  >
-                    <ArrowUpIcon className="mr-1 size-3 text-green-500" />
-                    Income
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => openNew("expense")}
-                  >
-                    <ArrowDownIcon className="mr-1 size-3 text-red-500" />
-                    Expense
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Tag</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead className="w-8" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sorted.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
-                          {new Date(item.date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </TableCell>
-                        <TableCell className="text-sm font-medium">
-                          {item.description}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="text-xs">
-                            <TagIcon className="mr-1 size-2.5" />
-                            {item.tag}
-                          </Badge>
-                        </TableCell>
-                        <TableCell
-                          className={cn(
-                            "text-right font-semibold tabular-nums",
-                            item.type === "income"
-                              ? "text-green-500"
-                              : "text-red-500",
-                          )}
-                        >
-                          {item.type === "income" ? "+" : "-"}$
-                          {item.amount.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className="hover:bg-accent inline-flex size-7 items-center justify-center rounded-md">
-                              <DotsThreeIcon className="size-4" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEdit(item)}>
-                                <PencilSimpleIcon className="mr-2 size-3.5" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-destructive focus:text-destructive"
-                                onClick={() => deleteItem(item.id)}
-                              >
-                                <TrashIcon className="mr-2 size-3.5" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {sorted.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          className="text-muted-foreground py-8 text-center"
-                        >
-                          No transactions yet
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+          <div className="flex items-center gap-2">
+            <Tabs
+              value={period}
+              onValueChange={(v) => setPeriod(v as TimePeriod)}
+            >
+              <TabsList>
+                <TabsTrigger value="month">
+                  <CalendarIcon className="mr-1 size-3.5" />
+                  This Month
+                </TabsTrigger>
+                <TabsTrigger value="alltime">All Time</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Button size="sm" onClick={() => openNew("expense")}>
+              <PlusIcon className="mr-1 size-4" />
+              Add
+            </Button>
           </div>
         </div>
-      </SidebarInset>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
+                Total Income
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <ArrowUpIcon className="size-4 text-green-500" />
+                <span className="text-2xl font-semibold">
+                  ${totalIncome.toLocaleString()}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
+                Total Expenses
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <ArrowDownIcon className="size-4 text-red-500" />
+                <span className="text-2xl font-semibold">
+                  ${totalExpenses.toLocaleString()}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-muted-foreground text-sm font-medium">
+                Balance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <span
+                className={cn(
+                  "text-2xl font-semibold",
+                  balance >= 0 ? "text-green-500" : "text-red-500",
+                )}
+              >
+                {balance >= 0 ? "+" : ""}${balance.toLocaleString()}
+              </span>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-3 gap-6">
+          {/* Pie Chart */}
+          <Card className="col-span-1">
+            <CardHeader>
+              <CardTitle className="text-sm">Expenses by Category</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center">
+              {expenseByTag.length > 0 ? (
+                <>
+                  <ChartContainer config={chartConfig} className="h-50 w-full">
+                    <PieChart>
+                      <Pie
+                        data={expenseByTag}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {expenseByTag.map((entry) => (
+                          <Cell
+                            key={entry.name}
+                            fill={TAG_COLORS[entry.name] ?? "var(--chart-1)"}
+                          />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="mt-2 flex w-full flex-col gap-1">
+                    {expenseByTag.map(({ name, value }) => (
+                      <div
+                        key={name}
+                        className="flex items-center justify-between text-xs"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className="size-2.5 rounded-full"
+                            style={{
+                              background: TAG_COLORS[name] ?? "var(--chart-1)",
+                            }}
+                          />
+                          <span className="text-muted-foreground">{name}</span>
+                        </div>
+                        <span className="font-medium">${value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground py-12 text-sm">
+                  No expenses
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Transactions Table */}
+          <Card className="col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-sm">Transactions</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openNew("income")}
+                >
+                  <ArrowUpIcon className="mr-1 size-3 text-green-500" />
+                  Income
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openNew("expense")}
+                >
+                  <ArrowDownIcon className="mr-1 size-3 text-red-500" />
+                  Expense
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Tag</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="w-8" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sorted.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
+                        {new Date(item.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        {item.description}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs">
+                          <TagIcon className="mr-1 size-2.5" />
+                          {item.tag}
+                        </Badge>
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          "text-right font-semibold tabular-nums",
+                          item.type === "income"
+                            ? "text-green-500"
+                            : "text-red-500",
+                        )}
+                      >
+                        {item.type === "income" ? "+" : "-"}$
+                        {item.amount.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="hover:bg-accent inline-flex size-7 items-center justify-center rounded-md">
+                            <DotsThreeIcon className="size-4" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEdit(item)}>
+                              <PencilSimpleIcon className="mr-2 size-3.5" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => deleteItem(item.id)}
+                            >
+                              <TrashIcon className="mr-2 size-3.5" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {sorted.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-muted-foreground py-8 text-center"
+                      >
+                        No transactions yet
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -646,6 +629,6 @@ export default function FinancePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }

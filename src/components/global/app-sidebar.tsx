@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { TerminalIcon } from "@phosphor-icons/react";
+import { navItems } from "@/lib/nav-items";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -28,7 +29,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent></SidebarContent>
+      <SidebarContent>
+        <NavMain items={navItems} />
+      </SidebarContent>
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

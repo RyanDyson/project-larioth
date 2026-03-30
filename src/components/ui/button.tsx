@@ -22,7 +22,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         gradient:
           "bg-gradient-to-b from-primary/20 to-primary/30 border border-primary/40 text-primary-foreground hover:bg-gradient-to-b hover:from-primary/30 hover:to-primary/40",
-        gradientDestructive: "",
+        gradientDestructive:
+          "bg-gradient-to-b from-destructive/20 to-destructive/30 border border-destructive/40 text-destructive-foreground hover:bg-gradient-to-b hover:from-destructive/30 hover:to-destructive/40",
         gradientGhost: "",
         gradientSecondary: "",
       },

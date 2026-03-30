@@ -1,5 +1,7 @@
+"use client";
+
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatBytes, formatContext, formatCapability } from "@/lib/formatters";
+import { formatBytes, formatContext } from "@/lib/formatters";
 import { InfoIcon } from "@phosphor-icons/react";
 import {
   Popover,
@@ -7,106 +9,96 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { Button } from "../ui/button";
-import { DataTable } from "../global/data-table";
+import { ModelDetailsTable } from "./model-details-table";
+import type { Model } from "@/server/api/routers/model";
+import type { LoadAction } from "@/hooks/use-load-unload";
+
+import { LoadUnloadButton } from "./load-unload-button";
+import { getModelIcon } from "@/lib/icons";
 
 export type ModelRow = {
   type?: string;
-  modelKey?: string;
-  format?: string;
   displayName?: string;
-  path?: string;
   sizeBytes?: number;
-  paramsString?: string;
-  architecture?: string;
-  vision?: boolean;
-  trainedForToolUse?: boolean;
   maxContextLength?: number;
   isLoaded?: boolean;
-  details?: DetailsRow[];
+  instanceId?: string;
+  details?: DetailsRow;
+  loadingAction?: LoadAction;
 };
 
-type DetailsRow = Omit<
-  ModelRow,
-  | "displayName"
-  | "type"
-  | "sizeBytes"
-  | "maxContextLength"
-  | "trainedForToolUse"
->;
+export type DetailsRow = {
+  modelKey?: string;
+  format?: string;
+  vision?: boolean;
+  paramsString?: string;
+  architecture?: string;
+  trainedForToolUse?: boolean;
+  path?: string;
+};
 
-const modelDetailsColumns: ColumnDef<DetailsRow>[] = [
-  {
-    accessorKey: "architecture",
-    header: "Architecture",
-    cell: ({ row }) => row.original.architecture ?? "-",
-  },
-  {
-    accessorKey: "format",
-    header: "Format",
-    cell: ({ row }) => row.original.format ?? "-",
-  },
-  {
-    accessorKey: "paramsString",
-    header: "Params",
-    cell: ({ row }) => row.original.paramsString ?? "-",
-  },
-];
+export function mapResponseToRow(res: Model[]): ModelRow[] {
+  return res.map((m) => ({
+    type: m.type,
+    displayName: m.display_name,
+    sizeBytes: m.size_bytes,
+    maxContextLength: m.max_context_length,
+    isLoaded: (m.loaded_instances?.length ?? 0) > 0,
+    instanceId: m.loaded_instances?.[0]?.id,
+    details: {
+      modelKey: m.key,
+      format: m.format ?? undefined,
+      vision: m.capabilities?.vision,
+      paramsString: m.params_string,
+      architecture: m.architecture,
+      trainedForToolUse: m.capabilities?.trained_for_tool_use,
+    },
+  }));
+}
 
 export const modelColumns: ColumnDef<ModelRow>[] = [
   {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => (
-      <div>
-        {row.original.isLoaded ? (
-          <Button variant="destructive">Eject</Button>
-        ) : (
-          <Button variant="gradient">Load</Button>
-        )}
-      </div>
+      <LoadUnloadButton
+        model={row?.original.details?.modelKey ?? ""}
+        instanceId={row?.original?.instanceId ?? ""}
+        isLoaded={row?.original?.isLoaded}
+      />
     ),
   },
   {
     accessorKey: "displayName",
     header: "Model",
-    cell: ({ row }) => (
-      <Popover>
-        <PopoverTrigger>
-          <span className="flex cursor-pointer items-center gap-1">
-            {row.original.displayName ?? "-"}{" "}
-            <InfoIcon className="text-muted-foreground ml-1 h-4 w-4" />
-          </span>
-        </PopoverTrigger>
-        <PopoverContent className="p-0">
-          <DataTable
-            columns={modelDetailsColumns}
-            data={row.original.details ?? []}
-          />
-        </PopoverContent>
-      </Popover>
-    ),
+    cell: ({ row }) => {
+      const Icon = getModelIcon(row.original.details?.modelKey ?? "");
+      return (
+        <Popover>
+          <PopoverTrigger>
+            <span className="flex cursor-pointer items-center gap-1">
+              {row.original.displayName ?? "-"}{" "}
+              {Icon && (
+                <span className="text-muted-foreground ml-1 flex size-4 shrink-0 items-center justify-center">
+                  {Icon}
+                </span>
+              )}
+              <InfoIcon className="text-muted-foreground ml-1 h-4 w-4" />
+            </span>
+          </PopoverTrigger>
+          <PopoverContent className="p-0">
+            <ModelDetailsTable details={row.original.details ?? {}} />
+          </PopoverContent>
+        </Popover>
+      );
+    },
   },
   {
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => row.original.type ?? "-",
   },
-  // {
-  //   accessorKey: "format",
-  //   header: "Format",
-  //   cell: ({ row }) => row.original.format ?? "-",
-  // },
-  // {
-  //   accessorKey: "paramsString",
-  //   header: "Params",
-  //   cell: ({ row }) => row.original.paramsString ?? "-",
-  // },
-  // {
-  //   accessorKey: "architecture",
-  //   header: "Architecture",
-  //   cell: ({ row }) => row.original.architecture ?? "-",
-  // },
+
   {
     accessorKey: "sizeBytes",
     header: "Size",
@@ -117,24 +109,4 @@ export const modelColumns: ColumnDef<ModelRow>[] = [
     header: "Max Context",
     cell: ({ row }) => formatContext(row.original.maxContextLength),
   },
-  // {
-  //   accessorKey: "vision",
-  //   header: "Vision",
-  //   cell: ({ row }) => formatCapability(row.original.vision),
-  // },
-  {
-    accessorKey: "trainedForToolUse",
-    header: "Tool Use",
-    cell: ({ row }) => formatCapability(row.original.trainedForToolUse),
-  },
-  // {
-  //   accessorKey: "modelKey",
-  //   header: "Model Key",
-  //   cell: ({ row }) => row.original.modelKey ?? "-",
-  // },
-  // {
-  //   accessorKey: "path",
-  //   header: "Path",
-  //   cell: ({ row }) => row.original.path ?? "-",
-  // },
 ];

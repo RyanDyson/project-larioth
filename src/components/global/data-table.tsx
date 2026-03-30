@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   type ColumnDef,
   flexRender,
@@ -25,6 +25,8 @@ interface DataTableProps<TData, TValue> {
   isLoading?: boolean;
   className?: string;
   activeIndex?: number;
+  activeRowKey?: string | null;
+  getRowKey?: (row: TData) => string | undefined | null;
   onRowActivate?: (index: number) => void;
 }
 
@@ -36,9 +38,12 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   className,
   activeIndex,
+  activeRowKey,
+  getRowKey,
   onRowActivate,
 }: DataTableProps<TData, TValue>) {
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+  const lastActiveRowKeyRef = useRef<string | null | undefined>(activeRowKey);
 
   const table = useReactTable({
     data,
@@ -46,11 +51,46 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  useEffect(() => {
-    if (activeIndex != null) {
-      rowRefs.current[activeIndex]?.scrollIntoView({ block: "nearest" });
+  const rows = table.getRowModel().rows;
+
+  const resolvedActiveIndex = useMemo(() => {
+    if (!rows.length) return undefined;
+
+    if (activeRowKey && getRowKey) {
+      const index = rows.findIndex(
+        (row) => getRowKey(row.original) === activeRowKey,
+      );
+      if (index >= 0) return index;
     }
-  }, [activeIndex]);
+
+    if (activeIndex != null) {
+      return Math.min(Math.max(activeIndex, 0), rows.length - 1);
+    }
+
+    return undefined;
+  }, [activeIndex, activeRowKey, getRowKey, rows]);
+
+  useEffect(() => {
+    if (resolvedActiveIndex != null) {
+      rowRefs.current[resolvedActiveIndex]?.scrollIntoView({
+        block: "nearest",
+      });
+    }
+  }, [resolvedActiveIndex]);
+
+  useEffect(() => {
+    if (!activeRowKey || !getRowKey) return;
+
+    if (lastActiveRowKeyRef.current === activeRowKey) return;
+    lastActiveRowKeyRef.current = activeRowKey;
+
+    const index = rows.findIndex(
+      (row) => getRowKey(row.original) === activeRowKey,
+    );
+    if (index >= 0) {
+      onRowActivate?.(index);
+    }
+  }, [activeRowKey, getRowKey, onRowActivate, rows]);
 
   return (
     <div className={cn("overflow-hidden rounded-md border", className)}>
@@ -82,28 +122,32 @@ export function DataTable<TData, TValue>({
                 ))}
               </TableRow>
             ))
-          ) : table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row, index) => (
-              <TableRow
-                key={row.id}
-                ref={(el) => {
-                  rowRefs.current[index] = el;
-                }}
-                data-state={row.getIsSelected() && "selected"}
-                data-active={index === activeIndex ? "true" : undefined}
-                className={cn(
-                  "cursor-pointer",
-                  index === activeIndex && "bg-accent/20",
-                )}
-                onClick={() => onRowActivate?.(index)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+          ) : rows.length ? (
+            rows.map((row, index) => {
+              const isActive = index === resolvedActiveIndex;
+
+              return (
+                <TableRow
+                  key={row.id}
+                  ref={(el) => {
+                    rowRefs.current[index] = el;
+                  }}
+                  data-state={row.getIsSelected() && "selected"}
+                  data-active={isActive ? "true" : undefined}
+                  className={cn("cursor-pointer", isActive && "bg-accent/20")}
+                  onClick={() => onRowActivate?.(index)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">

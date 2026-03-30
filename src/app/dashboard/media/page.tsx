@@ -235,121 +235,177 @@ export default function MediaPage() {
   }
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          {/* Toolbar */}
-          <div className="flex items-center gap-2 border-b px-4 py-2">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-1 text-sm">
-              <button
-                onClick={() => setPath([])}
-                className={cn(
-                  "hover:text-primary font-medium transition-colors",
-                  path.length === 0
-                    ? "text-foreground"
-                    : "text-muted-foreground",
-                )}
-              >
-                Media
-              </button>
-              {path.map((segment, i) => (
-                <React.Fragment key={i}>
-                  <CaretRightIcon className="text-muted-foreground size-3.5" />
-                  <button
-                    onClick={() => setPath(path.slice(0, i + 1))}
-                    className={cn(
-                      "hover:text-primary transition-colors",
-                      i === path.length - 1
-                        ? "text-foreground font-medium"
-                        : "text-muted-foreground",
-                    )}
+    <>
+      <div className="flex flex-1 flex-col">
+        {/* Toolbar */}
+        <div className="flex items-center gap-2 border-b px-4 py-2">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1 text-sm">
+            <button
+              onClick={() => setPath([])}
+              className={cn(
+                "hover:text-primary font-medium transition-colors",
+                path.length === 0 ? "text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Media
+            </button>
+            {path.map((segment, i) => (
+              <React.Fragment key={i}>
+                <CaretRightIcon className="text-muted-foreground size-3.5" />
+                <button
+                  onClick={() => setPath(path.slice(0, i + 1))}
+                  className={cn(
+                    "hover:text-primary transition-colors",
+                    i === path.length - 1
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {segment}
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+          {path.length > 0 && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0"
+              onClick={() => setPath((p) => p.slice(0, -1))}
+            >
+              <ArrowLeftIcon className="size-3.5" />
+            </Button>
+          )}
+
+          <div className="flex-1" />
+
+          <div className="relative">
+            <MagnifyingGlassIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+            <Input
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 w-48 pl-8 text-sm"
+            />
+          </div>
+          <Separator orientation="vertical" className="h-6" />
+          <Button size="sm" variant="outline" className="h-8">
+            <FolderPlusIcon className="mr-1.5 size-3.5" />
+            New Folder
+          </Button>
+          <Button size="sm" variant="outline" className="h-8">
+            <UploadSimpleIcon className="mr-1.5 size-3.5" />
+            Upload
+          </Button>
+          <Separator orientation="vertical" className="h-6" />
+          <Button
+            size="sm"
+            variant={view === "list" ? "default" : "ghost"}
+            className="h-8 w-8 p-0"
+            onClick={() => setView("list")}
+          >
+            <ListIcon className="size-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant={view === "grid" ? "default" : "ghost"}
+            className="h-8 w-8 p-0"
+            onClick={() => setView("grid")}
+          >
+            <SquaresFourIcon className="size-4" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto p-4">
+          {/* Grid View */}
+          {view === "grid" && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {filteredItems.map((item) => (
+                <DropdownMenu key={item.id}>
+                  <div
+                    className="group hover:bg-accent relative flex cursor-pointer flex-col items-center gap-2 rounded-xl border p-3 transition-colors select-none"
+                    onDoubleClick={() => handleItemDoubleClick(item)}
                   >
-                    {segment}
-                  </button>
-                </React.Fragment>
+                    {/* Thumbnail area */}
+                    <div className="bg-muted/50 flex size-16 items-center justify-center rounded-lg">
+                      {FILE_ICONS[item.type]}
+                    </div>
+                    {/* Name */}
+                    {renamingId === item.id ? (
+                      <Input
+                        autoFocus
+                        value={renameValue}
+                        className="h-6 px-1 text-center text-xs"
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onBlur={() => commitRename(item.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") commitRename(item.id);
+                          if (e.key === "Escape") setRenamingId(null);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className="line-clamp-2 w-full text-center text-xs leading-tight">
+                        {item.name}
+                      </span>
+                    )}
+                    {item.type === "folder" && item.items != null && (
+                      <span className="text-muted-foreground text-xs">
+                        {item.items} items
+                      </span>
+                    )}
+                    {item.size && (
+                      <Badge
+                        variant="secondary"
+                        className="px-1.5 py-0 text-xs"
+                      >
+                        {item.size}
+                      </Badge>
+                    )}
+                    {/* Context menu trigger */}
+                    <DropdownMenuTrigger
+                      className="hover:bg-accent absolute top-1.5 right-1.5 inline-flex size-5 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <DotsThreeVerticalIcon className="size-3.5" />
+                    </DropdownMenuTrigger>
+                  </div>
+                  <ContextMenu
+                    item={item}
+                    onRename={() => startRename(item)}
+                    onDelete={() => deleteItem(item.id)}
+                  />
+                </DropdownMenu>
               ))}
             </div>
-            {path.length > 0 && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 w-7 p-0"
-                onClick={() => setPath((p) => p.slice(0, -1))}
-              >
-                <ArrowLeftIcon className="size-3.5" />
-              </Button>
-            )}
+          )}
 
-            <div className="flex-1" />
-
-            <div className="relative">
-              <MagnifyingGlassIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
-              <Input
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-8 w-48 pl-8 text-sm"
-              />
-            </div>
-            <Separator orientation="vertical" className="h-6" />
-            <Button size="sm" variant="outline" className="h-8">
-              <FolderPlusIcon className="mr-1.5 size-3.5" />
-              New Folder
-            </Button>
-            <Button size="sm" variant="outline" className="h-8">
-              <UploadSimpleIcon className="mr-1.5 size-3.5" />
-              Upload
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button
-              size="sm"
-              variant={view === "list" ? "default" : "ghost"}
-              className="h-8 w-8 p-0"
-              onClick={() => setView("list")}
-            >
-              <ListIcon className="size-4" />
-            </Button>
-            <Button
-              size="sm"
-              variant={view === "grid" ? "default" : "ghost"}
-              className="h-8 w-8 p-0"
-              onClick={() => setView("grid")}
-            >
-              <SquaresFourIcon className="size-4" />
-            </Button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-auto p-4">
-            {/* Grid View */}
-            {view === "grid" && (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-                {filteredItems.map((item) => (
-                  <DropdownMenu key={item.id}>
-                    <div
-                      className="group hover:bg-accent relative flex cursor-pointer flex-col items-center gap-2 rounded-xl border p-3 transition-colors select-none"
-                      onDoubleClick={() => handleItemDoubleClick(item)}
-                    >
-                      {/* Thumbnail area */}
-                      <div className="bg-muted/50 flex size-16 items-center justify-center rounded-lg">
-                        {FILE_ICONS[item.type]}
-                      </div>
-                      {/* Name */}
+          {/* List View */}
+          {view === "list" && (
+            <div className="flex flex-col gap-px">
+              <div className="text-muted-foreground grid grid-cols-[2fr_1fr_1fr_1fr_40px] gap-4 px-3 py-1.5 text-xs font-medium">
+                <span>Name</span>
+                <span>Size</span>
+                <span>Duration</span>
+                <span>Modified</span>
+                <span />
+              </div>
+              <Separator />
+              {filteredItems.map((item) => (
+                <DropdownMenu key={item.id}>
+                  <div
+                    className="group hover:bg-accent grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_40px] items-center gap-4 rounded-lg px-3 py-2 transition-colors"
+                    onDoubleClick={() => handleItemDoubleClick(item)}
+                  >
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      {FILE_ICONS_SM[item.type]}
                       {renamingId === item.id ? (
                         <Input
                           autoFocus
                           value={renameValue}
-                          className="h-6 px-1 text-center text-xs"
+                          className="h-6 flex-1 px-1 text-xs"
                           onChange={(e) => setRenameValue(e.target.value)}
                           onBlur={() => commitRename(item.id)}
                           onKeyDown={(e) => {
@@ -359,121 +415,52 @@ export default function MediaPage() {
                           onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
-                        <span className="line-clamp-2 w-full text-center text-xs leading-tight">
-                          {item.name}
-                        </span>
+                        <span className="truncate text-sm">{item.name}</span>
                       )}
                       {item.type === "folder" && item.items != null && (
-                        <span className="text-muted-foreground text-xs">
+                        <span className="text-muted-foreground shrink-0 text-xs">
                           {item.items} items
                         </span>
                       )}
-                      {item.size && (
-                        <Badge
-                          variant="secondary"
-                          className="px-1.5 py-0 text-xs"
-                        >
-                          {item.size}
-                        </Badge>
-                      )}
-                      {/* Context menu trigger */}
-                      <DropdownMenuTrigger
-                        className="hover:bg-accent absolute top-1.5 right-1.5 inline-flex size-5 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <DotsThreeVerticalIcon className="size-3.5" />
-                      </DropdownMenuTrigger>
                     </div>
-                    <ContextMenu
-                      item={item}
-                      onRename={() => startRename(item)}
-                      onDelete={() => deleteItem(item.id)}
-                    />
-                  </DropdownMenu>
-                ))}
-              </div>
-            )}
-
-            {/* List View */}
-            {view === "list" && (
-              <div className="flex flex-col gap-px">
-                <div className="text-muted-foreground grid grid-cols-[2fr_1fr_1fr_1fr_40px] gap-4 px-3 py-1.5 text-xs font-medium">
-                  <span>Name</span>
-                  <span>Size</span>
-                  <span>Duration</span>
-                  <span>Modified</span>
-                  <span />
-                </div>
-                <Separator />
-                {filteredItems.map((item) => (
-                  <DropdownMenu key={item.id}>
-                    <div
-                      className="group hover:bg-accent grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_40px] items-center gap-4 rounded-lg px-3 py-2 transition-colors"
-                      onDoubleClick={() => handleItemDoubleClick(item)}
+                    <span className="text-muted-foreground text-sm">
+                      {item.size ?? "—"}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {item.duration ?? "—"}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {new Date(item.modifiedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <DropdownMenuTrigger
+                      className="hover:bg-accent inline-flex size-7 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="flex min-w-0 items-center gap-2.5">
-                        {FILE_ICONS_SM[item.type]}
-                        {renamingId === item.id ? (
-                          <Input
-                            autoFocus
-                            value={renameValue}
-                            className="h-6 flex-1 px-1 text-xs"
-                            onChange={(e) => setRenameValue(e.target.value)}
-                            onBlur={() => commitRename(item.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") commitRename(item.id);
-                              if (e.key === "Escape") setRenamingId(null);
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        ) : (
-                          <span className="truncate text-sm">{item.name}</span>
-                        )}
-                        {item.type === "folder" && item.items != null && (
-                          <span className="text-muted-foreground shrink-0 text-xs">
-                            {item.items} items
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        {item.size ?? "—"}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {item.duration ?? "—"}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {new Date(item.modifiedAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
-                      <DropdownMenuTrigger
-                        className="hover:bg-accent inline-flex size-7 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <DotsThreeVerticalIcon className="size-4" />
-                      </DropdownMenuTrigger>
-                    </div>
-                    <ContextMenu
-                      item={item}
-                      onRename={() => startRename(item)}
-                      onDelete={() => deleteItem(item.id)}
-                    />
-                  </DropdownMenu>
-                ))}
-              </div>
-            )}
+                      <DotsThreeVerticalIcon className="size-4" />
+                    </DropdownMenuTrigger>
+                  </div>
+                  <ContextMenu
+                    item={item}
+                    onRename={() => startRename(item)}
+                    onDelete={() => deleteItem(item.id)}
+                  />
+                </DropdownMenu>
+              ))}
+            </div>
+          )}
 
-            {filteredItems.length === 0 && (
-              <div className="text-muted-foreground flex flex-col items-center justify-center gap-3 py-24">
-                <FolderIcon className="size-12" />
-                <p className="text-sm">No files found</p>
-              </div>
-            )}
-          </div>
+          {filteredItems.length === 0 && (
+            <div className="text-muted-foreground flex flex-col items-center justify-center gap-3 py-24">
+              <FolderIcon className="size-12" />
+              <p className="text-sm">No files found</p>
+            </div>
+          )}
         </div>
-      </SidebarInset>
+      </div>
 
       {/* Preview Dialog */}
       <Dialog open={!!previewItem} onOpenChange={() => setPreviewItem(null)}>
@@ -539,6 +526,6 @@ export default function MediaPage() {
           )}
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }

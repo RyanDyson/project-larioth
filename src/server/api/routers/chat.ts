@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { chats, messages, MessageRole } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export const chatRouter = createTRPCRouter({
   createChat: protectedProcedure.mutation(async ({ ctx }) => {
@@ -21,6 +22,28 @@ export const chatRouter = createTRPCRouter({
 
     return userChats;
   }),
+  getChatDetails: protectedProcedure
+    .input(
+      z.object({
+        chatUuid: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const chat = await ctx.db.query.chats.findFirst({
+        where: (chats, { eq }) => eq(chats.uuid, input.chatUuid),
+      });
+
+      return chat;
+    }),
+  deleteChat: protectedProcedure
+    .input(
+      z.object({
+        chatUuid: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.delete(chats).where(eq(chats.uuid, input.chatUuid));
+    }),
   getMessages: protectedProcedure
     .input(
       z.object({

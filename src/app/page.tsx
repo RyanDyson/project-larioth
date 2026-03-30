@@ -2,6 +2,7 @@
 
 import { authClient } from "@/server/better-auth/client";
 import Dither from "@/components/global/Dither";
+import { toast } from "sonner";
 
 export default function Home() {
   return (
@@ -33,12 +34,16 @@ export default function Home() {
         </div>
 
         <button
-          onClick={() =>
-            authClient.signIn.social({
-              provider: "google",
-              callbackURL: "/dashboard",
-            })
-          }
+          onClick={async () => {
+            try {
+              await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/dashboard",
+              });
+            } catch (e) {
+              toast.error("Failed to authenticate");
+            }
+          }}
           className="from-primary/10 to-primary/20 hover:from-primary/20 text-primary-foreground w-full cursor-pointer items-center justify-center gap-3 rounded-xl border border-emerald-300/10 bg-linear-to-b px-5 py-3 text-sm font-medium shadow-none transition duration-200"
         >
           Sign in with Google
