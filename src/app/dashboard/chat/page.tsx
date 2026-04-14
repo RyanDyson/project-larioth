@@ -22,7 +22,7 @@ export default function Page() {
   ];
 
   return (
-    <div className="relative flex h-full min-h-[calc(100vh-var(--header-height))] w-full items-center justify-center overflow-hidden px-6 py-10">
+    <div className="relative flex h-[calc(100vh-var(--header-height))] w-full items-center justify-center overflow-hidden px-6 py-10">
       <div className="border-boder bg-background relative z-10 w-full max-w-3xl rounded-3xl border p-8 md:p-10">
         <h1 className="text-2xl font-semibold tracking-tight text-white md:text-4xl">
           How can I help you today?

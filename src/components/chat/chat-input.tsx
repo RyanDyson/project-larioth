@@ -20,7 +20,7 @@ import {
   CaretDownIcon,
 } from "@phosphor-icons/react";
 import { Textarea } from "../ui/textarea";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +56,8 @@ function getFileIcon() {
 }
 
 export function ChatInput({ uuid }: { uuid: string }) {
-  const { input, setInput, sendMessage, isSendingMessage } = useChat(uuid);
+  const { input, setInput, sendMessage, isSendingMessage, model, setModel } =
+    useChat(uuid);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,11 +66,14 @@ export function ChatInput({ uuid }: { uuid: string }) {
   const [openModelDialog, setOpenModelDialog] = useState<boolean>(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const dragCounterRef = useRef(0);
 
   const { data: models } = api.model.listYourModels.useQuery();
 
-  const rows = useMemo(() => mapResponseToRow(models?.models ?? []), [models]);
+  const rows = mapResponseToRow(models?.models ?? []).filter(
+    (row) => row.isLoaded,
+  );
 
   const handleFilesSelected = (files: FileList | File[]) => {
     if (!files.length) return;
@@ -174,10 +178,10 @@ export function ChatInput({ uuid }: { uuid: string }) {
           setIsDraggingFiles(false);
         }}
         className={cn(
-          "from-card/70 to-card/80 border-border absolute right-0 bottom-0 left-0 mx-auto flex h-fit w-full max-w-xl grow flex-col rounded-t-xl border border-b-0 bg-linear-to-b p-4 backdrop-blur-xl transition-all duration-300",
+          "from-card/70 to-card/80 border-border absolute right-0 bottom-0 left-0 z-30 mx-auto flex h-fit w-full max-w-xl grow flex-col rounded-t-xl border border-b-0 bg-linear-to-b p-4 backdrop-blur-md transition-all duration-300",
         )}
       >
-        <AnimatePresence initial={false} mode="popLayout">
+        <AnimatePresence initial={false}>
           {attachedFiles.length > 0 ? (
             <motion.div
               key="attachments"
@@ -283,10 +287,17 @@ export function ChatInput({ uuid }: { uuid: string }) {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-8 rounded-full px-3 text-xs font-normal transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
+                className="group h-8 rounded-full px-3 text-xs font-normal transition-all duration-200 hover:scale-[1.01] active:scale-[0.98]"
               >
-                <CaretDownIcon className="size-3.5 transition-transform duration-200" />
-                Model
+                <CaretDownIcon className="size-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                {model ? (
+                  <div className="flex items-center gap-1">
+                    {getModelIcon(model.key)}
+                    {model.display_name}
+                  </div>
+                ) : (
+                  "Select Model"
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="flex min-w-fit flex-col">
@@ -306,36 +317,55 @@ export function ChatInput({ uuid }: { uuid: string }) {
               </div>
               <DropdownMenuSeparator />
               <div className="p-1">
-                {rows.map((model) => {
-                  const Icon = getModelIcon(model.details?.modelKey ?? "");
-                  return (
-                    <DropdownMenuItem
-                      key={model.instanceId ?? model.details?.modelKey}
-                      className="flex w-full min-w-64 items-center justify-between gap-1 transition-colors duration-150"
-                    >
-                      <span className="flex items-center gap-2">
-                        {Icon && (
-                          <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center transition-transform duration-200">
-                            {Icon}
-                          </span>
+                {rows.length > 0 ? (
+                  rows.map((row) => {
+                    const Icon = getModelIcon(row.details?.modelKey ?? "");
+                    const isSelected = model?.key === row.details?.modelKey;
+                    return (
+                      <DropdownMenuItem
+                        key={row.instanceId ?? row.details?.modelKey}
+                        className={cn(
+                          "flex w-full min-w-64 items-center justify-between gap-1 transition-colors duration-150",
+                          isSelected &&
+                            "bg-emerald-500/20 focus:bg-emerald-500/30",
                         )}
-                        {model.displayName}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {model.details?.vision && (
-                          <Badge variant="blue">
-                            <EyeIcon className="size-3.5" />
-                          </Badge>
-                        )}
-                        {model.details?.trainedForToolUse && (
-                          <Badge variant="violet">
-                            <ToolboxIcon className="size-3.5" />
-                          </Badge>
-                        )}
-                      </div>
-                    </DropdownMenuItem>
-                  );
-                })}
+                        onClick={() => {
+                          const selectedModel = models?.models.find(
+                            (m) => m.key === row.details?.modelKey,
+                          );
+                          if (selectedModel) {
+                            setModel(selectedModel);
+                          }
+                        }}
+                      >
+                        <span className="flex items-center gap-2">
+                          {Icon && (
+                            <span className="text-muted-foreground flex size-4 shrink-0 items-center justify-center transition-transform duration-200">
+                              {Icon}
+                            </span>
+                          )}
+                          {row.displayName}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {row.details?.vision && (
+                            <Badge variant="blue">
+                              <EyeIcon className="size-3.5" />
+                            </Badge>
+                          )}
+                          {row.details?.trainedForToolUse && (
+                            <Badge variant="violet">
+                              <ToolboxIcon className="size-3.5" />
+                            </Badge>
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    );
+                  })
+                ) : (
+                  <span className="text-muted-foreground min-w-fit p-4 text-xs text-nowrap whitespace-nowrap">
+                    Load models into LMStudio to start.
+                  </span>
+                )}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -376,7 +406,7 @@ export function ChatInput({ uuid }: { uuid: string }) {
           <Button
             size="icon"
             onClick={handleSend}
-            disabled={isSendingMessage || input.trim() === ""}
+            disabled={isSendingMessage || input.trim() === "" || !model}
             className="border-primary/30 hover:bg-primary/30 from-primary/10 to-primary/20 size-8 shrink-0 cursor-pointer rounded-full border bg-transparent bg-linear-to-b transition-all duration-200 hover:scale-105 active:scale-95"
           >
             {isSendingMessage ? (

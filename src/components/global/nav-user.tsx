@@ -15,7 +15,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { DotsThreeVertical, SignOut, UserCircle } from "@phosphor-icons/react";
+import {
+  DotsThreeVerticalIcon,
+  SignOutIcon,
+  UserCircleIcon,
+} from "@phosphor-icons/react";
 import { authClient } from "@/server/better-auth/client";
 
 export function NavUser() {
@@ -42,7 +46,7 @@ export function NavUser() {
                 {session?.user.email}
               </span>
             </div>
-            <DotsThreeVertical className="ml-auto size-4" />
+            <DotsThreeVerticalIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56"
@@ -74,7 +78,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <UserCircle />
+                <UserCircleIcon />
                 Account
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -83,7 +87,7 @@ export function NavUser() {
               className="cursor-pointer"
               onClick={() => authClient.signOut({})}
             >
-              <SignOut />
+              <SignOutIcon />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

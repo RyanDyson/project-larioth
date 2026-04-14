@@ -3,13 +3,13 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useMemo, useState } from "react";
 import {
-  AlertDialog,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-  AlertDialogContent,
-} from "../ui/alert-dialog";
+  Dialog,
+  DialogHeader,
+  DialogFooter,
+  DialogCancel,
+  DialogAction,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -145,14 +145,14 @@ export const ChatSettingsDialog = ({
   }, [basePrompt, extraNotes, selectedPersonality.prompt]);
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent className="max-h-[90vh] w-full min-w-4xl overflow-hidden p-0">
-        <AlertDialogHeader className="border-border border-b px-5 py-4">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-h-[90vh] w-full min-w-4xl overflow-hidden p-0">
+        <DialogHeader className="border-border border-b px-5 py-4">
           <h3 className="text-lg font-semibold">Chat Settings</h3>
           <p className="text-muted-foreground text-sm">
             Configure the tone, prompt, and behavior for this chat.
           </p>
-        </AlertDialogHeader>
+        </DialogHeader>
 
         <div className="grid gap-0 md:grid-cols-[1fr_1.15fr]">
           {/* Left column */}
@@ -328,11 +328,11 @@ export const ChatSettingsDialog = ({
           </div>
         </div>
 
-        <AlertDialogFooter className="border-border border-t px-5 py-4">
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="gradient">Save Changes</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <DialogFooter className="border-border border-t px-5 py-4">
+          <DialogCancel>Cancel</DialogCancel>
+          <DialogAction variant="gradient">Save Changes</DialogAction>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

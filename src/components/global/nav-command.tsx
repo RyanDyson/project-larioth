@@ -74,8 +74,14 @@ export function NavCommand() {
       className="from-background/80 to-background/90 max-w-2xl bg-linear-to-b backdrop-blur-md"
     >
       <Command className="divide-border/70 flex flex-col divide-y bg-transparent px-0">
-        <div className="pb-2">
-          <CommandInput placeholder="Search routes, actions, and workflows..." />
+        <div className="border-border flex w-full items-center justify-center border-b font-mono text-sm font-medium">
+          Quick Actions
+        </div>
+        <div className="px-2 py-2">
+          <CommandInput
+            className="p-0"
+            placeholder="Search routes, actions, and workflows..."
+          />
         </div>
 
         <CommandList>

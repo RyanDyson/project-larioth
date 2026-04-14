@@ -8,6 +8,14 @@ import "./src/env.js";
 const config = {
   output: "standalone",
   serverExternalPackages: ["@lmstudio/sdk"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*",
+      },
+    ],
+  },
 };
 
 export default config;

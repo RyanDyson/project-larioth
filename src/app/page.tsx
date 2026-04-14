@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/server/better-auth/client";
-import Dither from "@/components/global/Dither";
+import Dither from "@/components/global/dither";
 import { toast } from "sonner";
 
 export default function Home() {

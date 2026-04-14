@@ -81,7 +81,7 @@ export default function Layout({ children }: { children: React.ReactElement }) {
         refetch={refetch}
       />
       <div className="flex h-full max-h-full overflow-hidden">
-        <aside className="border-border/70 flex w-80 shrink-0 flex-col border-r">
+        <aside className="border-border/70 flex w-80 shrink-0 flex-col border-r pt-(--header-height)">
           <div className="border-border/60 space-y-3 border-b p-4">
             <Button
               type="button"

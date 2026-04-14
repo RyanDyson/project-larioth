@@ -19,7 +19,10 @@ type BreadcrumbSegment = {
   isLast: boolean;
 };
 
-const BreadCrumbGenerator = (pathname: string): BreadcrumbSegment[] => {
+const BreadCrumbGenerator = (
+  pathname: string,
+  chatTitle?: string,
+): BreadcrumbSegment[] => {
   const normalizedPath = pathname.replace(/\/+$/, "") || "/";
   const segments = normalizedPath.split("/").filter(Boolean);
   const isDashboardRoute = segments[0] === "dashboard";
@@ -44,9 +47,13 @@ const BreadCrumbGenerator = (pathname: string): BreadcrumbSegment[] => {
     const href =
       "/" + [...priorSegments, ...trailSegments.slice(0, i + 1)].join("/");
     const isLast = i === trailSegments.length - 1;
-    const label = segment
+    let label = segment
       .replace(/[-_]/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
+
+    if (breadcrumbs[breadcrumbs.length - 1]?.label === "Chat" && chatTitle) {
+      label = chatTitle;
+    }
 
     breadcrumbs.push({
       label,
@@ -60,7 +67,23 @@ const BreadCrumbGenerator = (pathname: string): BreadcrumbSegment[] => {
 
 export function NavBreadCrumb() {
   const pathname = usePathname();
-  const breadcrumbs = BreadCrumbGenerator(pathname);
+
+  const segments = pathname.split("/").filter(Boolean);
+  const chatIndex = segments.indexOf("chat");
+  const chatUuid =
+    chatIndex !== -1 && chatIndex + 1 < segments.length
+      ? segments[chatIndex + 1]
+      : null;
+
+  const { data: chatDetails } = api.chat.getChatDetails.useQuery(
+    { chatUuid: chatUuid! },
+    { enabled: !!chatUuid },
+  );
+
+  const breadcrumbs = BreadCrumbGenerator(
+    pathname,
+    chatDetails?.title ?? undefined,
+  );
 
   return (
     <Breadcrumb>

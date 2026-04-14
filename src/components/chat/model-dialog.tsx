@@ -14,10 +14,14 @@ import { DataTable } from "../global/data-table";
 import { modelColumns, mapResponseToRow, type ModelRow } from "./model-columns";
 import { KeyboardIcon } from "../global/keyboard-icon";
 import { Switch } from "../ui/switch";
+import { useLoadUnload } from "@/hooks/use-load-unload";
+import { Progress } from "../ui/progress";
+import { motion } from "motion/react";
+import type { Dispatch, SetStateAction } from "react";
 
 type ModelDialogProps = {
   open: boolean;
-  onOpenChangeAction: (open: boolean) => void;
+  onOpenChangeAction: Dispatch<SetStateAction<boolean>>;
   onSelectAction?: (model: ModelRow) => void;
 };
 
@@ -31,16 +35,13 @@ export function ModelDialog({
   const [activeRowKey, setActiveRowKey] = useState<string | null>(null);
   const [rows, setRows] = useState<ModelRow[]>([]);
 
-  // const {
-  //   handleLoadUnload,
-  //   loadingModel,
-  //   loadingAction,
-  //   progress,
-  //   localLoadedState,
-  // } = useLoadUnload();
+  const { loadingModel, loadingAction, progress } = useLoadUnload();
 
-  const { data: models, isLoading: isLoadingModels } =
-    api.model.listYourModels.useQuery();
+  const {
+    data: models,
+    refetch: refetchModels,
+    isLoading: isLoadingModels,
+  } = api.model.listYourModels.useQuery();
 
   useEffect(() => {
     if (models && !isLoadingModels) {
@@ -53,7 +54,7 @@ export function ModelDialog({
     const lowerQuery = query.toLowerCase();
     return rows.filter(
       (row) =>
-        row.displayName?.toLowerCase().includes(lowerQuery) ||
+        row.displayName?.toLowerCase().includes(lowerQuery) ??
         row.details?.modelKey?.toLowerCase().includes(lowerQuery),
     );
   }, [rows, query]);
@@ -78,34 +79,56 @@ export function ModelDialog({
   filteredRowsRef.current = filteredRows;
   const activeIndexRef = useRef(activeIndex);
   activeIndexRef.current = activeIndex;
-  // const handleLoadUnloadRef = useRef(handleLoadUnload);
-  // handleLoadUnloadRef.current = handleLoadUnload;
-  // const localLoadedStateRef = useRef(localLoadedState);
-  // localLoadedStateRef.current = localLoadedState;
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActiveIndex((i) =>
-          Math.min(i + 1, filteredRowsRef.current.length - 1),
+        const next = Math.min(
+          activeIndexRef.current + 1,
+          filteredRowsRef.current.length - 1,
+        );
+        setActiveIndex(next);
+        setActiveRowKey(
+          filteredRowsRef.current[next]?.details?.modelKey ?? null,
         );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveIndex((i) => Math.max(i - 1, 0));
+        const next = Math.max(activeIndexRef.current - 1, 0);
+        setActiveIndex(next);
+        setActiveRowKey(
+          filteredRowsRef.current[next]?.details?.modelKey ?? null,
+        );
       } else if (e.key === "Enter") {
         e.preventDefault();
         const activeRow = filteredRowsRef.current[activeIndexRef.current];
         if (!activeRow?.details?.modelKey) return;
+
+        const table = document.querySelector("table");
+        if (table) {
+          const rows = table.querySelectorAll("tbody tr");
+          const activeTr = rows[activeIndexRef.current];
+          if (activeTr) {
+            const button = activeTr.querySelector("button");
+            if (button) button.click();
+          }
+        }
       }
     },
     [],
   );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeAction}>
+    <Dialog
+      open={open}
+      onOpenChange={async () => {
+        onOpenChangeAction((prev: boolean) => !prev);
+        await refetchModels();
+      }}
+    >
       <DialogContent
         showCloseButton={false}
+        onKeyDown={handleKeyDown}
         className="flex max-h-160 w-fit min-w-xl flex-col gap-0 overflow-hidden p-0"
       >
         {/* header */}
@@ -124,7 +147,6 @@ export function ModelDialog({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
             placeholder="Type to filter models..."
           />
         </div>
@@ -160,7 +182,7 @@ export function ModelDialog({
         </div>
 
         {/* loading progress */}
-        {/*<motion.div
+        <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{
             height: loadingModel ? "auto" : 0,
@@ -184,7 +206,7 @@ export function ModelDialog({
               </span>
             </div>
           </div>
-        </motion.div>*/}
+        </motion.div>
       </DialogContent>
     </Dialog>
   );
