@@ -8,5 +8,12 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["personal-apps_*"],
+  tablesFilter: [
+    "user",
+    "session",
+    "account",
+    "verification",
+    "chats",
+    "messages",
+  ],
 } satisfies Config;
